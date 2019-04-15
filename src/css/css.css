@@ -3,4 +3,16 @@
     vertical-align: middle;
 }
 
+.clear-bt, .render-bt {
+    margin-top: 20px;
+}
+
+.active {
+    display: unset;
+}
+
+.hidden {
+    display: none;
+}
+
 /*if have time do it pretty :]*/
