@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import TableRenderer from './TableRenderer';
 import ConfigFormRenderer from './ConfigFormRenderer';
-//import ItemEntry from './ItemEntry';
+import Entry from './Entry';
 
 export default class TableManager extends Component {
   state = {
     sinceLastArriveList: [],
     serviceTimeList: [],
     entryList: [],
-    tableRendered: true
+    simulationTimeLimit: 0,
+    workInProgress: true
   }
 
   addArriveTime = (arriveTime) => {
@@ -57,24 +58,70 @@ export default class TableManager extends Component {
     });
   }
 
+  getRandomFromList = (arrayList) => {
+    return Math.floor(Math.random()*arrayList.length);
+  }
+
+  generateRandomEntry = (id, lastEntry) => {
+    console.log(id);
+    console.log(typeof lastEntry);
+    let randomEntry = new Entry(id, 0, 0, 0, 0, 0, 0, 0, 0);
+    if (lastEntry===null || lastEntry===undefined) {
+      lastEntry = new Entry(id, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    randomEntry.id = id;
+    randomEntry.timeSinceLastArrive = this.getRandomFromList(this.state.sinceLastArriveList);
+    randomEntry.lastArriveTime = lastEntry.lastArriveTime + randomEntry.timeSinceLastArrive;
+    randomEntry.serviceTimeSpent = this.getRandomFromList(this.state.serviceTimeList);
+    randomEntry.timeInQueue = (lastEntry.serviceEndTime>=randomEntry.lastArriveTime) ?
+        lastEntry.serviceEndTime-randomEntry.lastArriveTime : 0;
+    randomEntry.serviceStartTime = randomEntry.lastArriveTime + randomEntry.timeInQueue;
+    randomEntry.serviceEndTime = randomEntry.serviceStartTime + randomEntry.serviceTimeSpent;
+    randomEntry.timeSpentOnSystem = randomEntry.timeInQueue + randomEntry.serviceTimeSpent;
+    randomEntry.freeTime = (lastEntry.serviceEndTime<randomEntry.lastArriveTime) ?
+        randomEntry.lastArriveTime-lastEntry.serviceEndTime: 0;
+
+    return randomEntry;
+  }
+
   renderTable = () => {
+    let workInProgress = true;
     let entries = [];
+    let id = 2;
+    let lastEntry = this.generateRandomEntry(1);
+    entries.push(lastEntry);
+
+    while (workInProgress) {
+      lastEntry = this.generateRandomEntry(id, lastEntry);
+      if (lastEntry.lastArriveTime < this.state.simulationTimeLimit) {
+        entries.push(lastEntry);
+        id++;
+      } else {
+        workInProgress = false;
+      }
+    }
+
     this.setState((state) => {
-      return {
-        entryList: entries,
-        tableRendered: true};
+      return {entryList: entries};
     });
-    console.log('render or rerender table');
   }
 
   cleanTable = () => {
     this.setState((state) => {
       return {
         entryList: [],
-        tableRendered: false
+        sinceLastArriveList: [],
+        serviceTimeList: [],
+        simulationTimeLimit: '',
       };
     });
-    console.log('clean table');
+  }
+
+  setSimulationTimeLimit = (timeLimit) => {
+    this.setState((state) => {
+      return {simulationTimeLimit: timeLimit};
+    });
   }
 
   render() {
@@ -83,19 +130,16 @@ export default class TableManager extends Component {
           <ConfigFormRenderer
             sinceLastArriveList={this.state.sinceLastArriveList}
             serviceTimeList={this.state.serviceTimeList}
-            isTableActive={this.state.tableRendered}
             addArriveTime={this.addArriveTime}
             addServiceTime={this.addServiceTime}
             removeArriveTime={this.removeArriveTime}
             removeServiceTime={this.removeServiceTime}
             renderTable={this.renderTable}
             cleanTable={this.cleanTable}
+            setSimulationTimeLimit={this.setSimulationTimeLimit}
           />
           <TableRenderer
             entryList={this.state.entryList}
-            isActive={this.state.tableRendered}
-            renderTable={this.renderTable}
-            cleanTable={this.cleanTable}
           />
         </div>
     );

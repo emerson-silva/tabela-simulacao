@@ -10,6 +10,7 @@ export default class ConfigFormRenderer extends Component {
   state = {
     arriveTime: '',
     serviceTime: '',
+    simulationTime: '',
     arriveTimeList: [],
     serviceTimeList: []
   }
@@ -61,6 +62,24 @@ export default class ConfigFormRenderer extends Component {
     })
   }
 
+  clearForms = () => {
+    this.setState((state) => {
+      return {
+        arriveTime: '',
+        serviceTime: '',
+        simulationTime: '',
+        arriveTimeList: [],
+        serviceTimeList: []
+      };
+    });
+    this.props.cleanTable();
+  }
+
+  submitForms = () => {
+    this.props.setSimulationTimeLimit(this.state.simulationTime);
+    this.props.renderTable();
+  }
+
   render() {
     return (
         <div id="ConfigFormRenderer">
@@ -74,6 +93,7 @@ export default class ConfigFormRenderer extends Component {
                       aria-label="Tempo entre requisições"
                       aria-describedby="basic-addon2"
                       type="number"
+                      min="0" max="10080"
                       name="arriveTime"
                       value={this.state.arriveTime}
                       onChange={this.handleChange}
@@ -100,8 +120,9 @@ export default class ConfigFormRenderer extends Component {
                     <Form.Control
                       placeholder="Tempo de serviço"
                       aria-label="Tempo de serviço"
-                      aria-describedby="basic-addon2"
+                      aria-describedby="Tempo de serviço"
                       type="number"
+                      min="0" max="10080"
                       name="serviceTime"
                       value={this.state.serviceTime}
                       onChange={this.handleChange}
@@ -123,19 +144,28 @@ export default class ConfigFormRenderer extends Component {
                 </Form.Group>
               </Col>
             </Row>
-            <Row className={this.props.isTableActive ? 'hidden':'render-bt'}>
-              <Col>
-                <Button variant="outline-primary" size="lg" onSubmit={this.props.renderTable} block>
-                  Gerar Tablela
-                </Button>
-              </Col>
-            </Row>
             <Row>
               <Col>
-                <Button className={this.props.isTableActive ? 'hidden':'clear-bt'}
-                    variant="outline-danger" size="lg" onSubmit={this.props.cleanTable}>
-                  Limpar Configuração
-                </Button>
+                <Form.Group>
+                  <InputGroup>
+                    <Form.Control
+                      placeholder="Tempo de Simulação"
+                      aria-label="Tempo de Simulação"
+                      aria-describedby="Tempo de Simulação"
+                      type="number"
+                      name="simulationTime"
+                      min="0" max="10080"
+                      value={this.state.simulationTime}
+                      onChange={this.handleChange}
+                    />
+                    <InputGroup.Append>
+                      <Button variant="outline-primary"
+                        onClick={this.submitForms}>Simular</Button>
+                      <Button variant="outline-danger"
+                        onClick={this.clearForms}>Limpar</Button>
+                    </InputGroup.Append>
+                  </InputGroup>
+                </Form.Group>
               </Col>
             </Row>
           </Form>
