@@ -13,10 +13,8 @@ export default class TableManager extends Component {
   }
 
   addArriveTime = (arriveTime) => {
-    console.log(arriveTime);
     if (this.state.sinceLastArriveList.indexOf(arriveTime)<0) {
       this.setState((state) => {
-        console.log("addingArriveTime");
         let sinceLastArriveList = this.state.sinceLastArriveList;
         sinceLastArriveList.push(arriveTime);
         return {
@@ -59,21 +57,22 @@ export default class TableManager extends Component {
   }
 
   getRandomFromList = (arrayList) => {
-    return Math.floor(Math.random()*arrayList.length);
+    if (arrayList.length) {
+      return arrayList[Math.floor(Math.random()*arrayList.length)];
+    }
+    return 0;
   }
 
   generateRandomEntry = (id, lastEntry) => {
-    console.log(id);
-    console.log(typeof lastEntry);
     let randomEntry = new Entry(id, 0, 0, 0, 0, 0, 0, 0, 0);
     if (lastEntry===null || lastEntry===undefined) {
       lastEntry = new Entry(id, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     randomEntry.id = id;
-    randomEntry.timeSinceLastArrive = this.getRandomFromList(this.state.sinceLastArriveList);
+    randomEntry.timeSinceLastArrive = parseInt(this.getRandomFromList(this.state.sinceLastArriveList));
     randomEntry.lastArriveTime = lastEntry.lastArriveTime + randomEntry.timeSinceLastArrive;
-    randomEntry.serviceTimeSpent = this.getRandomFromList(this.state.serviceTimeList);
+    randomEntry.serviceTimeSpent = parseInt(this.getRandomFromList(this.state.serviceTimeList));
     randomEntry.timeInQueue = (lastEntry.serviceEndTime>=randomEntry.lastArriveTime) ?
         lastEntry.serviceEndTime-randomEntry.lastArriveTime : 0;
     randomEntry.serviceStartTime = randomEntry.lastArriveTime + randomEntry.timeInQueue;

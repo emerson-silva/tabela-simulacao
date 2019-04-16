@@ -16,28 +16,31 @@ export default class ConfigFormRenderer extends Component {
   }
 
   handleChange = ({target}) => {
-    this.setState({
-      [target.name]: target.value
+    this.setState((state) => {
+      return {[target.name]: target.value};
     });
   }
 
   handleChangeArray = ({target}) => {
     let nArray = [];
     let options = target.options;
-    console.log(target);
-    console.log(options);
     if (options && options.length > 0) {
       for (let i=0; i<options.length; i++) {
-        console.log(i + " >> " + options[i].selected);
         if (options[i].selected) {
           nArray.push(options[i].value);
         }
       }
     }
-    console.log(nArray);
-    this.setState({
-      [target.name]: nArray
-    })
+    this.setState((state) => {
+      return {[target.name]: nArray};
+    });
+  }
+
+  handleChangeSimTime = ({target}) => {
+    this.setState((state) => {
+      return {[target.name]: target.value};
+    });
+    this.props.setSimulationTimeLimit(target.value);
   }
 
   addArriveTime = () => {
@@ -50,16 +53,16 @@ export default class ConfigFormRenderer extends Component {
 
   removeArriveTime = () => {
     this.props.removeArriveTime(this.state.arriveTimeList);
-    this.setState({
-      arriveTimeList: []
-    })
+    this.setState((state) => {
+      return {arriveTimeList: []}
+    });
   }
 
   removeServiceTime = () => {
     this.props.removeServiceTime(this.state.serviceTimeList);
-    this.setState({
-      serviceTimeList: []
-    })
+    this.setState((state) => {
+      return {serviceTimeList: []};
+    });
   }
 
   clearForms = () => {
@@ -76,7 +79,6 @@ export default class ConfigFormRenderer extends Component {
   }
 
   submitForms = () => {
-    this.props.setSimulationTimeLimit(this.state.simulationTime);
     this.props.renderTable();
   }
 
@@ -156,7 +158,7 @@ export default class ConfigFormRenderer extends Component {
                       name="simulationTime"
                       min="0" max="10080"
                       value={this.state.simulationTime}
-                      onChange={this.handleChange}
+                      onChange={this.handleChangeSimTime}
                     />
                     <InputGroup.Append>
                       <Button variant="outline-primary"
